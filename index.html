@@ -10,6 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
         rel="stylesheet">
 
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#16a34a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="الهرم الذكي">
+    <link rel="apple-touch-icon" href="assets/icon-512.png">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -78,12 +86,34 @@
                     <span class="text-[10px] text-gray-500">لصحة البيت المصري</span>
                 </div>
             </button>
-            <button id="home-btn" onclick="router('home')"
-                class="hidden p-2 text-gray-400 hover:text-green-600 bg-gray-50 rounded-full cursor-pointer border-none">
-                <i data-lucide="home" class="w-5 h-5"></i>
-            </button>
+            <div class="flex items-center gap-2">
+                <button id="install-btn"
+                    class="hidden bg-green-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-md hover:bg-green-700 transition cursor-pointer border-none flex items-center gap-1">
+                    <i data-lucide="download" class="w-4 h-4"></i> تثبيت
+                </button>
+                <button id="home-btn" onclick="router('home')"
+                    class="hidden p-2 text-gray-400 hover:text-green-600 bg-gray-50 rounded-full cursor-pointer border-none">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                </button>
+            </div>
         </div>
     </header>
+
+    <!-- PWA Install Prompt (iOS) -->
+    <div id="ios-install-prompt"
+        class="hidden fixed bottom-0 left-0 right-0 bg-white p-4 shadow-2xl z-[100] border-t-4 border-green-500 rounded-t-2xl animate-slide-up text-center">
+        <h3 class="font-bold text-gray-800 mb-2">تثبيت التطبيق على الآيفون 📱</h3>
+        <p class="text-sm text-gray-600 mb-4">عشان التطبيق يشتغل معاك بدون نت وبكامل الشاشة:</p>
+        <div class="flex items-center justify-center gap-2 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl mb-4 mx-4">
+            <span>اضغط على</span>
+            <span class="inline-block"><i data-lucide="share" class="w-5 h-5 text-blue-500"></i></span>
+            <span>ثم</span>
+            <span class="inline-block font-bold">"Add to Home Screen"</span>
+            <span class="inline-block"><i data-lucide="plus-square" class="w-5 h-5 text-gray-500"></i></span>
+        </div>
+        <button onclick="document.getElementById('ios-install-prompt').classList.add('hidden')"
+            class="text-green-600 font-bold text-sm border-none bg-transparent cursor-pointer">فهمت، شكراً 👍</button>
+    </div>
 
     <main class="max-w-md mx-auto min-h-[calc(100vh-60px)] relative">
 
@@ -172,6 +202,26 @@
                         <div>
                             <h3 class="font-bold text-gray-800 text-sm">ليه اتغيرنا؟</h3>
                             <p class="text-[10px] text-gray-500">القديم كان غلط؟</p>
+                        </div>
+                    </div>
+
+                    <div onclick="router('library')"
+                        class="bg-rose-50 p-4 rounded-2xl text-right transition-transform hover:scale-105 cursor-pointer flex flex-col justify-between min-h-[110px] shadow-sm">
+                        <div class="bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm mb-2"><i
+                                data-lucide="book-open" class="text-rose-500"></i></div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm">قاموس الأكل</h3>
+                            <p class="text-[10px] text-gray-500">نعرف بناكل إيه</p>
+                        </div>
+                    </div>
+
+                    <div onclick="router('builder')"
+                        class="bg-lime-50 p-4 rounded-2xl text-right transition-transform hover:scale-105 cursor-pointer flex flex-col justify-between min-h-[110px] shadow-sm border-none ring-2 ring-lime-500/30">
+                        <div class="bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm mb-2"><i
+                                data-lucide="chef-hat" class="text-lime-600"></i></div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm">شكل طبقك</h3>
+                            <p class="text-[10px] text-gray-500">احسب وجبتك صح</p>
                         </div>
                     </div>
                 </div>
@@ -322,29 +372,55 @@
         </div>
 
         <!-- OTHER VIEWS (Swaps, Plans, Why) - Static content -->
-        <div id="view-swaps" class="view hidden p-4 animate-fade-in">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">بدائل صحية</h2>
+        <div id="view-swaps" class="view hidden p-4 animate-fade-in pb-20">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">بدائل صحية (وفري صحتك)</h2>
             <div class="space-y-4">
-                <!-- Example Card 1 -->
+
+                <!-- Drinks -->
+                <h3 class="font-bold text-gray-600 text-sm mt-4 mb-2 border-b pb-1">المشروبات</h3>
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="bg-gray-50 px-4 py-2 border-b border-gray-100 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-800 text-sm">الفينو والمخبوزات</h3>
-                        <div class="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold">بديل ذكي
-                        </div>
-                    </div>
                     <div class="p-4 grid grid-cols-[1fr,auto,1fr] gap-2 items-center text-center">
-                        <div class="text-red-500 font-bold text-xs mb-1 line-through opacity-60">عيش فينو</div>
+                        <div class="text-red-500 font-bold text-xs mb-1 line-through opacity-60">مشروب غازي</div>
                         <i data-lucide="arrow-right" class="text-green-500 w-4 h-4 mx-auto"></i>
-                        <div class="text-green-700 font-bold text-xs mb-1">عيش بلدي (ردة)</div>
+                        <div class="text-green-700 font-bold text-xs mb-1">كركديه ساقع / ينسون</div>
                     </div>
                     <div class="px-4 pb-4 pt-0 text-right">
-                        <p
-                            class="text-[10px] text-gray-500 bg-gray-50 p-2 rounded-lg leading-relaxed border border-gray-100">
-                            <span class="font-bold text-gray-600">السبب:</span> الردة بتقلل امتصاص السكر وتشبع لفترة
-                            أطول.</p>
+                        <p class="text-[10px] text-gray-500 bg-gray-50 p-2 rounded-lg leading-relaxed"><span
+                                class="font-bold text-gray-600">ليه؟</span> الصودا فيها 10 معالق سكر بتضرب المناعة،
+                            الكركديه بيظبط الضغط ومنعش.</p>
                     </div>
                 </div>
-                <!-- More cards can be added similarly -->
+
+                <!-- Snacks -->
+                <h3 class="font-bold text-gray-600 text-sm mt-4 mb-2 border-b pb-1">التسالي</h3>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-4 grid grid-cols-[1fr,auto,1fr] gap-2 items-center text-center">
+                        <div class="text-red-500 font-bold text-xs mb-1 line-through opacity-60">شيبسي ومواد حافظة</div>
+                        <i data-lucide="arrow-right" class="text-green-500 w-4 h-4 mx-auto"></i>
+                        <div class="text-green-700 font-bold text-xs mb-1">ترمس / فشار بيتي</div>
+                    </div>
+                    <div class="px-4 pb-4 pt-0 text-right">
+                        <p class="text-[10px] text-gray-500 bg-gray-50 p-2 rounded-lg leading-relaxed"><span
+                                class="font-bold text-gray-600">ليه؟</span> الترمس بروتين نباتي ممتاز بيشبع، الفشار
+                            ألياف (بس بلاش زيت كتير).</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-4 grid grid-cols-[1fr,auto,1fr] gap-2 items-center text-center">
+                        <div class="text-red-500 font-bold text-xs mb-1 line-through opacity-60">حلويات شرقية</div>
+                        <i data-lucide="arrow-right" class="text-green-500 w-4 h-4 mx-auto"></i>
+                        <div class="text-green-700 font-bold text-xs mb-1">بطاطا مشوية / فاكهة</div>
+                    </div>
+                    <div class="px-4 pb-4 pt-0 text-right">
+                        <p class="text-[10px] text-gray-500 bg-gray-50 p-2 rounded-lg leading-relaxed"><span
+                                class="font-bold text-gray-600">ليه؟</span> البطاطا نشويات معقدة وفيتامين أ، الحلويات
+                            سكر ودهون مهدرجة صافي.</p>
+                    </div>
+                </div>
+
+                <!-- Mains -->
+                <h3 class="font-bold text-gray-600 text-sm mt-4 mb-2 border-b pb-1">الأساسيات</h3>
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="bg-gray-50 px-4 py-2 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="font-bold text-gray-800 text-sm">طاسة القلي</h3>
@@ -357,48 +433,47 @@
                         <div class="text-green-700 font-bold text-xs mb-1">شوي / قلاية هوائية</div>
                     </div>
                     <div class="px-4 pb-4 pt-0 text-right">
-                        <p
-                            class="text-[10px] text-gray-500 bg-gray-50 p-2 rounded-lg leading-relaxed border border-gray-100">
-                            <span class="font-bold text-gray-600">السبب:</span> تقليل السعرات والدهون المهدرجة الضارة.
+                        <p class="text-[10px] text-gray-500 bg-gray-50 p-2 rounded-lg leading-relaxed"><span
+                                class="font-bold text-gray-600">السبب:</span> القلي بيحول الدهون لسموم وبيعلي السعرات
+                            الضعف.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-4 grid grid-cols-[1fr,auto,1fr] gap-2 items-center text-center">
+                        <div class="text-red-500 font-bold text-xs mb-1 line-through opacity-60">عيش فينو</div>
+                        <i data-lucide="arrow-right" class="text-green-500 w-4 h-4 mx-auto"></i>
+                        <div class="text-green-700 font-bold text-xs mb-1">عيش بلدي (ردة)</div>
+                    </div>
+                    <div class="px-4 pb-4 pt-0 text-right">
+                        <p class="text-[10px] text-gray-500 bg-gray-50 p-2 rounded-lg leading-relaxed"><span
+                                class="font-bold text-gray-600">السبب:</span> الردة بتقلل امتصاص السكر وتشبع لفترة أطول.
                         </p>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <div id="view-plan" class="view hidden p-4 animate-fade-in">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">خطة الأكل المقترحة</h2>
-            <div class="space-y-4">
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="flex items-center gap-3 mb-3 border-b border-gray-50 pb-3">
-                        <div class="text-green-600 bg-green-50 p-2 rounded-lg"><i data-lucide="egg" class="w-5 h-5"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-sm">الفطار</h3><span
-                                class="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">7:00 AM</span>
-                        </div>
-                    </div>
-                    <ul class="space-y-2 pr-4 list-disc text-xs text-gray-600">
-                        <li>فول بالزيت الحار والكمون</li>
-                        <li>جبنة قريش بالطماطم</li>
-                        <li>بيض مسلوق</li>
-                    </ul>
-                </div>
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="flex items-center gap-3 mb-3 border-b border-gray-50 pb-3">
-                        <div class="text-green-600 bg-green-50 p-2 rounded-lg"><i data-lucide="utensils"
-                                class="w-5 h-5"></i></div>
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-sm">الغداء</h3><span
-                                class="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">3:00 PM</span>
-                        </div>
-                    </div>
-                    <ul class="space-y-2 pr-4 list-disc text-xs text-gray-600">
-                        <li>طبق سلطة كبير (أساسي)</li>
-                        <li>بروتين (فراخ/سمك/لحمة)</li>
-                        <li>نشويات (أرز/فريك) بكمية قليلة</li>
-                    </ul>
-                </div>
+        <div id="view-plan" class="view hidden p-4 animate-fade-in pb-20">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">خطط أكل مقترحة</h2>
+
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                <button onclick="setPlanTab('balanced')" id="btn-plan-balanced"
+                    class="plan-tab-btn bg-green-600 text-white px-4 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all border-none shadow-md cursor-pointer">المتوازن
+                    (الأشهر)</button>
+                <button onclick="setPlanTab('economic')" id="btn-plan-economic"
+                    class="plan-tab-btn bg-white text-gray-500 px-4 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all border border-gray-100 cursor-pointer">التوفير
+                    الذكي</button>
+                <button onclick="setPlanTab('quick')" id="btn-plan-quick"
+                    class="plan-tab-btn bg-white text-gray-500 px-4 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all border border-gray-100 cursor-pointer">السريع
+                    (للأمهات)</button>
+            </div>
+
+            <!-- Content Container -->
+            <div id="plan-content" class="space-y-4">
+                <!-- JS injected content -->
             </div>
         </div>
 
@@ -413,6 +488,87 @@
                 <h3 class="font-bold text-gray-800 text-sm mb-2">مشاكل السمنة</h3>
                 <p class="text-xs text-gray-600 leading-relaxed">النظام القديم كان بيعتمد بشكل كبير على النشويات اللي
                     بتزود الوزن وبتعمل مقاومة أنسولين.</p>
+            </div>
+        </div>
+
+        <!-- NEW: FOOD LIBRARY VIEW -->
+        <div id="view-library" class="view hidden p-4 animate-fade-in pb-20">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">قاموس الأكل المصري</h2>
+            <div class="relative mb-6">
+                <input type="text" id="lib-search" placeholder="ابحث عن أكلة (مثلاً: طعمية، بيض)..."
+                    class="w-full bg-white border border-gray-200 rounded-xl py-3 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-green-500 text-right">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="search" class="text-gray-400 w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div id="lib-results" class="space-y-3">
+                <!-- JS will populate -->
+            </div>
+        </div>
+
+        <!-- NEW: PLATE BUILDER VIEW -->
+        <div id="view-builder" class="view hidden p-4 animate-fade-in pb-20">
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mb-6 text-center">
+                <h2 class="text-xl font-bold text-gray-800 mb-1">شكّل طبقك</h2>
+                <p class="text-xs text-gray-500 mb-4">اختار مكونات وجبتك وشوف النتيجة</p>
+
+                <div class="flex justify-center gap-2 mb-4">
+                    <button onclick="setBuilderMeal('breakfast')" id="btn-bm-breakfast"
+                        class="px-4 py-2 rounded-full text-xs font-bold bg-green-100 text-green-700 cursor-pointer border-none shadow-sm transition-all">فطار</button>
+                    <button onclick="setBuilderMeal('lunch')" id="btn-bm-lunch"
+                        class="px-4 py-2 rounded-full text-xs font-bold bg-gray-100 text-gray-500 cursor-pointer border-none transition-all">غداء</button>
+                    <button onclick="setBuilderMeal('dinner')" id="btn-bm-dinner"
+                        class="px-4 py-2 rounded-full text-xs font-bold bg-gray-100 text-gray-500 cursor-pointer border-none transition-all">عشاء</button>
+                </div>
+
+                <div class="relative h-4 bg-gray-100 rounded-full overflow-hidden mb-1">
+                    <div id="builder-bar" class="absolute top-0 right-0 h-full bg-green-500 transition-all duration-500"
+                        style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-gray-400 font-bold px-1">
+                    <span id="builder-percentage">0% من الوجبة</span>
+                    <span id="builder-total">0 جرام بروتين</span>
+                </div>
+                <div id="builder-msg" class="text-xs font-bold mt-2 text-orange-500 h-5"></div>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-gray-800 text-sm">مكونات الطبق:</h3>
+                    <button onclick="openFoodSelector()"
+                        class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 shadow hover:bg-green-700 transition cursor-pointer border-none">
+                        <i data-lucide="plus" class="w-4 h-4"></i> إضافة
+                    </button>
+                </div>
+                <div id="builder-items" class="space-y-2">
+                    <div
+                        class="text-center text-gray-400 py-8 text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                        لسة ماضيفتش حاجة للطبق
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Food Selector Modal -->
+        <div id="food-modal"
+            class="hidden fixed inset-0 z-[60] bg-black/50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in text-right">
+            <div
+                class="bg-white w-full max-w-sm rounded-3xl p-5 max-h-[80vh] overflow-y-auto shadow-2xl animate-slide-up">
+                <div class="flex justify-between items-center mb-4">
+                    <button onclick="closeFoodSelector()"
+                        class="p-1 rounded-full bg-gray-100 text-gray-500 cursor-pointer border-none"><i data-lucide="x"
+                            class="w-5 h-5"></i></button>
+                    <h3 class="font-bold text-lg">اختر صنف</h3>
+                </div>
+                <div class="relative mb-3">
+                    <input type="text" id="modal-search" placeholder="ابحث..."
+                        class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-green-500 text-right">
+                    <i data-lucide="search" class="absolute right-2 top-2.5 text-gray-400 w-4 h-4"></i>
+                </div>
+                <div class="space-y-2" id="modal-food-list">
+                    <!-- JS Injected -->
+                </div>
             </div>
         </div>
 

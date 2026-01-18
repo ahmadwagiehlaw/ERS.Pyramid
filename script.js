@@ -48,23 +48,72 @@ const calcFactors = {
     athlete: { low: 1.6, medium: 1.8, high: 2.2, label: 'رياضي' }
 };
 
+const foodLibrary = [
+    { id: 'egg', name: 'بيض مسلوق', unit: 'بيضة', protein: 6, cb: 0.6, type: 'protein', icon: 'egg' },
+    { id: 'foul', name: 'فول (4 معالق)', unit: '100جم', protein: 7, cb: 15, type: 'protein', icon: 'utensils' },
+    { id: 'ta3meya', name: 'طعمية بيتي', unit: 'قرص', protein: 5, cb: 10, type: 'fat', icon: 'circle' },
+    { id: 'cottage', name: 'جبنة قريش', unit: '100جم', protein: 11, cb: 3, type: 'protein', icon: 'cheese' },
+    { id: 'feta', name: 'جبنة فيتا', unit: '100جم', protein: 14, cb: 4, type: 'fat', icon: 'cheese' },
+    { id: 'milk', name: 'لبن جاموسي', unit: 'كوب', protein: 8, cb: 12, type: 'protein', icon: 'milk' },
+    { id: 'yogurt', name: 'زبادي بلدي', unit: 'كوب', protein: 8, cb: 10, type: 'protein', icon: 'milk' },
+    { id: 'bread_b', name: 'عيش بلدي', unit: 'رغيف', protein: 9, cb: 50, type: 'carb', icon: 'circle' },
+    { id: 'bread_f', name: 'عيش فينو', unit: 'رغيف', protein: 4, cb: 25, type: 'carb', icon: 'circle' },
+    { id: 'rice', name: 'أرز رزة ورزة', unit: '5 معالق', protein: 2, cb: 28, type: 'carb', icon: 'utensils' },
+    { id: 'macaroni', name: 'مكرونة', unit: '5 معالق', protein: 3, cb: 30, type: 'carb', icon: 'utensils' },
+    { id: 'chicken', name: 'فراخ (صدر)', unit: '100جم', protein: 31, cb: 0, type: 'protein', icon: 'drumstick' },
+    { id: 'meat', name: 'لحمة حمراء', unit: '100جم', protein: 26, cb: 0, type: 'protein', icon: 'beef' },
+    { id: 'fish', name: 'سمك مشوي', unit: '100جم', protein: 22, cb: 0, type: 'protein', icon: 'fish' },
+    { id: 'tuna', name: 'تونا دايت', unit: 'علبة', protein: 23, cb: 0, type: 'protein', icon: 'fish' },
+    { id: 'termis', name: 'ترمس', unit: 'كوب', protein: 16, cb: 10, type: 'snack', icon: 'smile' },
+    { id: 'koshary', name: 'كشري', unit: 'طبق وسط', protein: 12, cb: 60, type: 'carb', icon: 'utensils' }
+];
+
+const mealPlans = {
+    balanced: [
+        { title: 'الفطار', time: '7:00 AM', icon: 'sun', items: ['فول بالزيت الحار', 'جبنة قريش', 'نصف رغيف بلدي', 'خيار وطماطم'] },
+        { title: 'الغداء', time: '3:00 PM', icon: 'utensils', items: ['سمك مشوي / تونة', '4 معالق أرز', 'سلطة خضراء كبيرة'] },
+        { title: 'العشاء', time: '8:00 PM', icon: 'moon', items: ['زبادي + ليمون', 'ثمرة فاكهة'] }
+    ],
+    economic: [
+        { title: 'الفطار', time: '7:00 AM', icon: 'sun', items: ['3 معالق فول بالطماطم', 'باذنجان مشوي', 'عيش بلدي'] },
+        { title: 'الغداء', time: '3:00 PM', icon: 'utensils', items: ['كشري (عدس كتير)', 'سلطة دقة', 'صلصة خفيفة'] },
+        { title: 'العشاء', time: '8:00 PM', icon: 'moon', items: ['جبنة بالطماطم', 'عيش سن'] }
+    ],
+    quick: [
+        { title: 'الفطار', time: '8:00 AM', icon: 'sun', items: ['شوفان باللبن / كورن فليكس', 'موزة', 'قهوة'] },
+        { title: 'الغداء', time: '4:00 PM', icon: 'utensils', items: ['بانيه مشوي (إيرفراير)', 'مكرونة مسلوقة', 'سلطة زبادي'] },
+        { title: 'العشاء', time: '9:00 PM', icon: 'moon', items: ['فشار', 'جبنة فيتا'] }
+    ]
+};
+
 // --- STATE ---
 let currentState = {
     calc: { persona: 'woman', weight: 70, activity: 'medium', meals: 3 },
-    pyramidSelected: null
+    pyramidSelected: null,
+    builder: {
+        meal: 'breakfast',
+        items: [] // { id, count }
+    },
+    planTab: 'balanced'
 };
 
 // --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
+    loadState(); // Load saved data
     initPyramid();
     updateCalculator();
+    initLibrary();
+    initBuilder();
+    setPlanTab(currentState.planTab || 'balanced'); // Init Plan
+    initPWA(); // PWA Setup
 
     // Weight Input Listener
     document.getElementById('weight-input').addEventListener('input', (e) => {
         currentState.calc.weight = parseInt(e.target.value);
         document.getElementById('weight-display').textContent = currentState.calc.weight + ' كجم';
         updateCalculator();
+        saveState();
     });
 });
 
@@ -137,14 +186,17 @@ function togglePyramidLevel(id) {
 function setCalcPersona(p) {
     currentState.calc.persona = p;
     updateCalcUI();
+    saveState();
 }
 function setCalcActivity(a) {
     currentState.calc.activity = a;
     updateCalcUI();
+    saveState();
 }
 function setMealCount(m) {
     currentState.calc.meals = m;
     updateCalcUI();
+    saveState();
 }
 
 function updateCalcUI() {
@@ -236,4 +288,257 @@ function setPersonaInfo(pId) {
         btn.className = 'persona-btn flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-all border-none bg-white text-gray-600 border border-gray-100 shadow-sm';
     });
     document.getElementById(`btn-info-${pId}`).className = 'persona-btn flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-all border-none bg-indigo-600 text-white';
+}
+// --- STORAGE LOGIC ---
+function saveState() {
+    localStorage.setItem('smartPyramidState', JSON.stringify(currentState));
+}
+
+function loadState() {
+    const saved = localStorage.getItem('smartPyramidState');
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        // Merge with defaults to ensure structure validity if new fields added later
+        currentState = { ...currentState, calc: parsed.calc };
+        // We don't restore views or pyramid selection to start fresh
+    }
+    // Update weight display initially
+    document.getElementById('weight-display').textContent = currentState.calc.weight + ' كجم';
+    document.getElementById('weight-input').value = currentState.calc.weight;
+}
+
+// --- PWA LOGIC ---
+function initPWA() {
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(reg => console.log('SW Registered'))
+            .catch(err => console.log('SW Error', err));
+    }
+
+    // Install Prompt (Android/Desktop)
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('install-btn');
+        installBtn.classList.remove('hidden');
+
+        installBtn.addEventListener('click', () => {
+            installBtn.classList.add('hidden');
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                deferredPrompt = null;
+            });
+        });
+    });
+
+    // iOS Detection
+    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+
+    if (isIos && !isInStandaloneMode) {
+        setTimeout(() => {
+            // Check if already dismissed in this session? (Optional, skipping for simplicity)
+            document.getElementById('ios-install-prompt').classList.remove('hidden');
+        }, 3000);
+    }
+}
+
+// --- LIBRARY LOGIC ---
+function initLibrary() {
+    const searchInput = document.getElementById('lib-search');
+    const resultsDiv = document.getElementById('lib-results');
+
+    function renderLibrary(term = '') {
+        const filtered = term ? foodLibrary.filter(f => f.name.includes(term)) : foodLibrary;
+        resultsDiv.innerHTML = filtered.map(item => `
+            <div class="bg-white p-3 rounded-xl border border-gray-100 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="bg-green-50 p-2 rounded-lg text-green-600">
+                        <i data-lucide="${item.icon}" class="w-5 h-5"></i>
+                    </div>
+                    <div class="text-right">
+                        <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
+                        <span class="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">${item.unit}</span>
+                    </div>
+                </div>
+                <div class="text-left rtl:text-right">
+                    <span class="block font-bold text-green-600 text-sm">${item.protein}g <span class="text-[10px] font-normal text-gray-400">بروتين</span></span>
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    searchInput.addEventListener('input', (e) => renderLibrary(e.target.value));
+    renderLibrary(); // Initial render
+}
+
+// --- BUILDER LOGIC ---
+function initBuilder() {
+    updateBuilderUI();
+
+    // Modal Search
+    document.getElementById('modal-search').addEventListener('input', (e) => {
+        renderModalFoodList(e.target.value);
+    });
+}
+
+function setBuilderMeal(meal) {
+    currentState.builder.meal = meal;
+    currentState.builder.items = [];
+    updateBuilderUI();
+}
+
+function openFoodSelector() {
+    document.getElementById('food-modal').classList.remove('hidden');
+    renderModalFoodList();
+}
+
+function closeFoodSelector() {
+    document.getElementById('food-modal').classList.add('hidden');
+}
+
+function renderModalFoodList(term = '') {
+    const list = document.getElementById('modal-food-list');
+    const filtered = term ? foodLibrary.filter(f => f.name.includes(term)) : foodLibrary;
+
+    list.innerHTML = filtered.map(item => `
+        <div onclick="addBuilderItem('${item.id}')" class="bg-gray-50 p-3 rounded-xl border border-gray-100 flex items-center justify-between cursor-pointer hover:bg-green-50 transition">
+            <div class="flex items-center gap-3">
+                <i data-lucide="${item.icon}" class="w-4 h-4 text-gray-400"></i>
+                <div>
+                   <h4 class="font-bold text-gray-700 text-sm">${item.name}</h4>
+                   <span class="text-[10px] text-gray-400">${item.unit}</span>
+                </div>
+            </div>
+            <i data-lucide="plus-circle" class="w-5 h-5 text-green-500"></i>
+        </div>
+    `).join('');
+    lucide.createIcons();
+}
+
+function addBuilderItem(id) {
+    const existing = currentState.builder.items.find(i => i.id === id);
+    if (existing) {
+        existing.count++;
+    } else {
+        currentState.builder.items.push({ id, count: 1 });
+    }
+    closeFoodSelector();
+    updateBuilderUI();
+}
+
+function updateBuilderItem(id, change) {
+    const item = currentState.builder.items.find(i => i.id === id);
+    if (!item) return;
+
+    item.count += change;
+    if (item.count <= 0) {
+        currentState.builder.items = currentState.builder.items.filter(i => i.id !== id);
+    }
+    updateBuilderUI();
+}
+
+function updateBuilderUI() {
+    // 1. Update Meal Buttons
+    ['breakfast', 'lunch', 'dinner'].forEach(m => {
+        const btn = document.getElementById(`btn-bm-${m}`);
+        if (m === currentState.builder.meal) {
+            btn.className = 'px-4 py-2 rounded-full text-xs font-bold bg-green-100 text-green-700 cursor-pointer border-none shadow-sm transition-all';
+        } else {
+            btn.className = 'px-4 py-2 rounded-full text-xs font-bold bg-gray-100 text-gray-500 cursor-pointer border-none transition-all';
+        }
+    });
+
+    // 2. Render Items
+    const itemsContainer = document.getElementById('builder-items');
+    if (currentState.builder.items.length === 0) {
+        itemsContainer.innerHTML = '<div class="text-center text-gray-400 py-8 text-sm bg-gray-50 rounded-xl border border-dashed border-gray-200">لسة ماضيفتش حاجة للطبق</div>';
+    } else {
+        itemsContainer.innerHTML = currentState.builder.items.map(i => {
+            const food = foodLibrary.find(f => f.id === i.id);
+            return `
+                <div class="bg-white p-3 rounded-xl border border-gray-100 flex items-center justify-between shadow-sm">
+                    <div class="text-right">
+                        <h4 class="font-bold text-gray-800 text-sm">${food.name}</h4>
+                        <span class="text-[10px] text-gray-400">${(food.protein * i.count).toFixed(1)}g بروتين</span>
+                    </div>
+                    <div class="flex items-center gap-3 bg-gray-50 rounded-lg p-1">
+                        <button onclick="updateBuilderItem('${i.id}', 1)" class="w-6 h-6 rounded-md bg-white text-green-600 flex items-center justify-center shadow-sm cursor-pointer border-none"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                        <span class="font-bold text-sm min-w-[10px] text-center">${i.count}</span>
+                        <button onclick="updateBuilderItem('${i.id}', -1)" class="w-6 h-6 rounded-md bg-white text-red-500 flex items-center justify-center shadow-sm cursor-pointer border-none"><i data-lucide="minus" class="w-3 h-3"></i></button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    lucide.createIcons();
+
+    // 3. Calculate Totals
+    let totalP = 0;
+    currentState.builder.items.forEach(i => {
+        const food = foodLibrary.find(f => f.id === i.id);
+        totalP += food.protein * i.count;
+    });
+
+    // Target per meal? (Daily Target / 3) roughly
+    const { persona, weight, activity } = currentState.calc;
+    const factor = calcFactors[persona][activity];
+    const dailyTarget = Math.round(weight * factor);
+    const mealTarget = Math.round(dailyTarget / 3); // Approx
+
+    const percentage = Math.min(100, Math.round((totalP / mealTarget) * 100));
+
+    document.getElementById('builder-bar').style.width = `${percentage}%`;
+    document.getElementById('builder-total').innerText = `${totalP.toFixed(1)} جرام`;
+    document.getElementById('builder-percentage').innerText = `${percentage}% من احتياج الوجبة`;
+
+    // Msg
+    const msgEl = document.getElementById('builder-msg');
+    if (percentage < 50) {
+        msgEl.innerText = 'محتاج تزود بروتين كمان 💪';
+        msgEl.className = 'text-xs font-bold mt-2 text-orange-500 h-5';
+        document.getElementById('builder-bar').className = 'absolute top-0 right-0 h-full bg-orange-400 transition-all duration-500';
+    } else if (percentage < 90) {
+        msgEl.innerText = 'قربت توصل، عاش! 🔥';
+        msgEl.className = 'text-xs font-bold mt-2 text-yellow-500 h-5';
+        document.getElementById('builder-bar').className = 'absolute top-0 right-0 h-full bg-yellow-400 transition-all duration-500';
+    } else {
+        msgEl.innerText = 'وجبة ممتازة يا بطل! 🏆';
+        msgEl.className = 'text-xs font-bold mt-2 text-green-600 h-5';
+        document.getElementById('builder-bar').className = 'absolute top-0 right-0 h-full bg-green-500 transition-all duration-500';
+    }
+}
+
+// --- PLAN LOGIC ---
+function setPlanTab(tab) {
+    currentState.planTab = tab;
+
+    // Update Tabs
+    document.querySelectorAll('.plan-tab-btn').forEach(btn => {
+        btn.className = 'plan-tab-btn bg-white text-gray-500 px-4 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all border border-gray-100 cursor-pointer';
+    });
+    document.getElementById(`btn-plan-${tab}`).className = 'plan-tab-btn bg-green-600 text-white px-4 py-2 rounded-full whitespace-nowrap text-xs font-bold transition-all border-none shadow-md cursor-pointer';
+
+    // Render Content
+    const plan = mealPlans[tab];
+    const container = document.getElementById('plan-content');
+
+    container.innerHTML = plan.map(meal => `
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 relative overflow-hidden animate-fade-in">
+            <div class="flex items-center gap-3 mb-3 border-b border-gray-50 pb-3">
+                <div class="text-green-600 bg-green-50 p-2 rounded-lg"><i data-lucide="${meal.icon}" class="w-5 h-5"></i></div>
+                <div>
+                    <h3 class="font-bold text-gray-800 text-sm">${meal.title}</h3><span class="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">${meal.time}</span>
+                </div>
+            </div>
+            <ul class="space-y-2 pr-4 list-disc text-xs text-gray-600">
+                ${meal.items.map(i => `<li>${i}</li>`).join('')}
+            </ul>
+        </div>
+    `).join('');
+    lucide.createIcons();
+    saveState();
 }

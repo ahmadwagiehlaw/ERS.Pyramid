@@ -1,0 +1,22 @@
+{
+  "name": "الهرم الغذائي المصري الذكي",
+  "short_name": "الهرم الذكي",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#16a34a",
+  "description": "تطبيق يساعدك على اتباع نظام غذائي صحي متوازن يناسب البيت المصري.",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "portrait"
+}
